@@ -97,7 +97,7 @@ angular.module('ion-affix', ['ionic'])
     require: '^$ionicScroll',
     link: function ($scope, $element, $attr, $ionicScroll) {
       // Direction of scroll
-      var affix_direction = $attr.direction && $attr.direction=="bottom" ? $attr.direction : "top";
+      var affixPosition = $attr.affixPosition && $attr.affixPosition=="bottom" ? $attr.affixPosition : "top";
       // get the affix's container. element will be affix for that container.
       // affix's container will be matched by "affix-within-parent-with-class" attribute.
       // if it is not provided, parent element will be assumed as the container
@@ -125,10 +125,16 @@ angular.module('ion-affix', ['ionic'])
 
         var affixHeight = elementOffset.height;
 
-        scrollMin = scrollTop + containerTop;
-        scrollMax = scrollMin + containerHeight;
-        scrollTransition = scrollMax - affixHeight;
+        if(affixPosition == "top"){
+          scrollMin = scrollTop + containerTop;
+          scrollMax = scrollMin + containerHeight;
+          scrollTransition = scrollMax - affixHeight;
+        } else { // bottom case
+          scrollMax = containerTop;
+          scrollTransition = scrollMax - affixHeight;
+        }
       };
+
       // throttled version of the same calculation
       var throttledCalculateScrollLimits = throttle(
         calculateScrollLimits,
@@ -140,17 +146,18 @@ angular.module('ion-affix', ['ionic'])
 
       // creates the affix clone and adds it to DOM. by default it is put to top
       var createAffixClone =  function () {
-        var clone = affix_direction=="top" ? $element.clone().css({
+        var affixCSS = affixPosition == "top" ? {
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0
-        }) : $element.clone().css({
+        } : {
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0
-        });
+        };
+        var clone = $element.clone().css({affixCSS});
 
         // if directive is given an additional CSS class to apply to the clone, then apply it
         if ($attr.affixClass) {
@@ -183,7 +190,6 @@ angular.module('ion-affix', ['ionic'])
         removeAffixClone();
         angular.element($ionicScroll.element).off('scroll');
       });
-
 
       angular.element($ionicScroll.element).on('scroll', function (event) {
         var scrollTop = (event.detail || event.originalEvent && event.originalEvent.detail).scrollTop;
