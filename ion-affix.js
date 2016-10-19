@@ -157,7 +157,7 @@ angular.module('ion-affix', ['ionic'])
           left: 0,
           right: 0
         };
-        var clone = $element.clone().css({affixCSS});
+        var clone = $element.clone().css(affixCSS);
 
         // if directive is given an additional CSS class to apply to the clone, then apply it
         if ($attr.affixClass) {
@@ -219,7 +219,8 @@ angular.module('ion-affix', ['ionic'])
           // if we're reaching towards the end of the container, apply some nice translation to move up/down the clone
           // but if we're reached already to the container and we're far away than the end, move clone to top
           if (scrollTop > scrollTransition) {
-            translateUp(affixClone[0], Math.floor(scrollTop - scrollTransition), cloneCreatedJustNow);
+						var transition = affixPosition == "top" ? Math.floor(scrollTop - scrollTransition) : Math.ceil(scrollTop + scrollTransition)
+            translateUp(affixClone[0], transition, cloneCreatedJustNow);
           } else {
             translateUp(affixClone[0], 0, cloneCreatedJustNow);
           }
